@@ -1,6 +1,8 @@
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 const create string = `
 	CREATE TABLE IF NOT EXISTS DatabaseTweets (
@@ -16,10 +18,10 @@ const create string = `
 	);
 	`
 
-const file string = "updates.db"
+
 
 func createTables() (error) {
-	db, err := sql.Open("sqlite3", file)
+	db, err := sql.Open("sqlite3", getDbPath())
 	if err != nil {
 		return err
 	}

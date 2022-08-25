@@ -10,7 +10,7 @@ import (
 
 // check if user already in database
 func get_twitter_user_from_db(username string) (*twitter.User, error) {
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
@@ -46,7 +46,7 @@ func get_twitter_user_from_db(username string) (*twitter.User, error) {
 func add_twitter_user_to_db (user *twitter.User) {
 	log.Printf("Saving user @%s to database\n", user.ScreenName)
 	
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
@@ -72,7 +72,7 @@ func list_users() {
 	fmt.Println("Listing all users registered to the database:")
 	fmt.Println("---------------------------------------------")
 
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}

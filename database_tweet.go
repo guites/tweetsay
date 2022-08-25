@@ -12,7 +12,7 @@ import (
 func add_tweet_to_db (tweet *twitter.Tweet) {
 	log.Printf("Saving tweet @%d to database: https://twitter.com/%s/status/%d\n", tweet.ID, tweet.User.ScreenName, tweet.ID)
 	
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
@@ -38,7 +38,7 @@ func add_tweet_to_db (tweet *twitter.Tweet) {
 func get_user_timeline_from_db(user *twitter.User) (bool) {
 	log.Printf("Searching for tweets from @%s in database\n", user.ScreenName)
 	
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
@@ -82,7 +82,7 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 }
 
 func get_random_tweet(username string) {
-	db, db_err := sql.Open("sqlite3", "./updates.db")
+	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}

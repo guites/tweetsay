@@ -2,6 +2,8 @@ package main
 
 import (
 	"envholder"
+	"log"
+	"os"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
@@ -28,4 +30,13 @@ func prepare_twitter_api() (*twitter.Client){
 	httpClient := config.Client(oauth1.NoContext, token)
 	client := twitter.NewClient(httpClient)
 	return client
+}
+
+func getDbPath() (string){
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal( err )
+	}
+	file := dirname + "/.francais-du-jour.db"
+	return file
 }
