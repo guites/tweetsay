@@ -33,24 +33,48 @@ func get_twitter_user_from_db(username string) (*twitter.User, error) {
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
+	log.Printf("Searching for user @%s in database\n", username)
+	
+	defer db.Close()
 
-	db_user, err := getUserFromDatabase(username, db)
-	return db_user, err
+	var user twitter.User
+	stmt, stmt_err := db.Prepare("SELECT * FROM DatabaseUsers WHERE ScreenName = ?")
+	
+	if stmt_err != nil {
+		log.Fatal("Error preparing statement", stmt_err)
+	}
+
+	defer stmt.Close()
+
+	err := stmt.QueryRow(username).Scan(
+		&user.ID,
+		&user.CreatedAt,
+		&user.ScreenName,
+	)
+	
+	if err != nil {
+		log.Printf("user @%s not found in database\n", username)
+		return nil, err
+	}
+
+	log.Printf("user @%s already in database\n", username)
+	return &user, err
 }
 
 // add user object to database
 func add_twitter_user_to_db (user *twitter.User) {
+	log.Printf("Saving user @%s to database\n", user.ScreenName)
+	
 	db, db_err := sql.Open("sqlite3", "./updates.db")
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
-
 	stmt, stmt_err := db.Prepare("INSERT INTO DatabaseUsers (ID, Name, ScreenName) VALUES (?, ?, ?)")
 
 	if stmt_err != nil {
 		log.Fatalf((stmt_err.Error()))
 	}
-	res, err := stmt.Exec(
+	_, err := stmt.Exec(
 		user.ID,
 		user.Name,
 		user.ScreenName,
@@ -60,7 +84,6 @@ func add_twitter_user_to_db (user *twitter.User) {
 		log.Fatal((err.Error()))
 	}
 	defer stmt.Close()
-	log.Print(res)
 }
 
 func get_twitter_user_by_username(username string, client *twitter.Client) (*twitter.User){
@@ -70,6 +93,7 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*twi
 		return db_user
 	}
 
+	log.Printf("Fetching user @%s from Twitter API\n", username)
 	user, _, err := client.Users.Show(&twitter.UserShowParams{
 		ScreenName: username, // "Antho_Repartie",
 	})
@@ -81,7 +105,7 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*twi
 	add_twitter_user_to_db(user)
 
 	fmt.Printf("Account: @%s (%s) (%d)\n", user.ScreenName, user.Name, user.ID)
-	fmt.Printf("Last Tweet ID: %d\n", user.Status.ID)
+	fmt.Printf("Last Tweet ID: %d\n", user.Status.ID) // TODO: maybe this errors out when user has never tweeted
 	return user
 }
 
