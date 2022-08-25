@@ -1,10 +1,10 @@
 package main
 
 type DatabaseTweets struct {
-	ID        int64
-	CreatedAt string
-	FullText  string
-	Username  string
+	ID          int64
+	CreatedAt   string
+	FullText    string
+	UserName    string
 }
 
 type DatabaseUsers struct {

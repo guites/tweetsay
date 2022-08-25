@@ -109,8 +109,87 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*twi
 	return user
 }
 
-func get_user_timeline(user *twitter.User, client *twitter.Client) ([]twitter.Tweet) {
-		tweets, _, err := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
+// add tweet object to database
+func add_tweet_to_db (tweet *twitter.Tweet) {
+	log.Printf("Saving tweet @%d to database: https://twitter.com/%s/status/%d\n", tweet.ID, tweet.User.ScreenName, tweet.ID)
+	
+	db, db_err := sql.Open("sqlite3", "./updates.db")
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	stmt, stmt_err := db.Prepare("INSERT INTO DatabaseTweets (ID, CreatedAt, FullText, UserName) VALUES (?, ?, ?, ?)")
+
+	if stmt_err != nil {
+		log.Fatalf((stmt_err.Error()))
+	}
+	_, err := stmt.Exec(
+		tweet.ID,
+		tweet.CreatedAt,
+		tweet.FullText,
+		tweet.User.ScreenName,
+	)
+
+	if err != nil {
+		log.Fatal((err.Error()))
+	}
+	defer stmt.Close()
+}
+
+// check if user timeline already in database
+func get_user_timeline_from_db(user *twitter.User) (bool) {
+	log.Printf("Searching for tweets from @%s in database\n", user.ScreenName)
+	
+	db, db_err := sql.Open("sqlite3", "./updates.db")
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+
+	stmt, stmt_err := db.Prepare("SELECT * FROM DatabaseTweets WHERE UserName = ?")
+	if stmt_err != nil {
+		log.Fatal("Error preparing statement", stmt_err)
+	}
+	defer stmt.Close()
+
+	rows, rows_err := stmt.Query(user.ScreenName)
+	if rows_err != nil {
+		log.Fatal("Error executing statement:", rows_err)
+	}
+	defer rows.Close()
+
+	var timeline []twitter.Tweet
+	var ID int64
+	var CreatedAt string
+	var FullText string
+	var UserName string
+
+	for rows.Next() {
+		err := rows.Scan(
+			&ID,
+			&CreatedAt,
+			&FullText,
+			&UserName,
+		)
+		if err != nil {
+			log.Fatal("Error while iterating over timeline results from db", err)
+		}
+		timeline = append(timeline, twitter.Tweet{ID: ID, CreatedAt: CreatedAt, FullText: FullText})
+	}
+	if len(timeline) > 0 {
+		log.Printf("found %d tweets from @%s in the database\n", len(timeline), user.ScreenName)
+		return true
+	}
+	return false
+}
+
+
+func get_user_timeline(user *twitter.User, client *twitter.Client) () {
+
+	if get_user_timeline_from_db(user) {
+		return
+	}
+	log.Printf("Fetching user @%s tweets from Twitter API\n", user.ScreenName)
+	tweets, _, err := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
 		UserID: user.ID,
     	Count: 3200,
 		TweetMode: "extended",
@@ -119,9 +198,10 @@ func get_user_timeline(user *twitter.User, client *twitter.Client) ([]twitter.Tw
 		fmt.Printf("err: %s\n", err)
 	}
 	for _, tweet := range tweets {
-		fmt.Printf("%s\n", tweet.FullText)
+		// fmt.Printf("%s\n", tweet.FullText)
+		add_tweet_to_db(&tweet)
 	}
-	return tweets
+	return
 }
 
 func add_user_timeline(client *twitter.Client) {
@@ -175,8 +255,8 @@ func main() {
 			log.Fatal("Usage: add_user_timeline @user_handle")
 		}
 		username := removeAt(cmdArgs[1])
-		get_twitter_user_by_username(username, client)
-		// get_user_timeline(user, client)
+		user := get_twitter_user_by_username(username, client)
+		get_user_timeline(user, client)
 	default:
 		fmt.Println(available_commands)
 	}
