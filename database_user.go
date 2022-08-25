@@ -84,12 +84,6 @@ func list_users() {
 	}
 	defer rows.Close()
 
-	// type UserWithDBTweetCount struct {
-	// 	User twitter.User
-	// 	DbTweetCount int
-	// }
-
-	// var db_users []UserWithDBTweetCount
 	var ID int64
 	var Name string
 	var ScreenName string
@@ -106,7 +100,6 @@ func list_users() {
 			log.Fatal("Error while iterating over timeline results from db", err)
 		}
 		fmt.Printf("@%s (%s) - %d tweets\n", ScreenName, Name, DbTweetCount)
-		// db_users = append(db_users, UserWithDBTweetCount{User: twitter.User{ID: ID, Name: Name, ScreenName: ScreenName}, DbTweetCount: DbTweetCount})
 	}
 
 }
