@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -78,4 +79,33 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 		return true
 	}
 	return false
+}
+
+func get_random_tweet(username string) {
+	db, db_err := sql.Open("sqlite3", "./updates.db")
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+
+	var tweet twitter.Tweet
+	stmt, stmt_err := db.Prepare("SELECT ID, FullText, CreatedAt FROM DatabaseTweets WHERE Username = ? ORDER BY RANDOM() LIMIT 1 ;")
+	
+	if stmt_err != nil {
+		log.Fatal("Error preparing statement", stmt_err)
+	}
+
+	defer stmt.Close()
+
+	err := stmt.QueryRow(username).Scan(
+		&tweet.ID,
+		&tweet.FullText,
+		&tweet.CreatedAt,
+	)
+	
+	if err != nil {
+		log.Fatal("error while querying the database for tweets - ", err)
+	}
+
+	fmt.Println(tweet.FullText)
 }

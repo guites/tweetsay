@@ -39,7 +39,8 @@ func main() {
 	client := prepare_twitter_api()
 	cmdArgs := os.Args[1:]
 	if len(cmdArgs) < 1 {
-		log.Fatal(available_commands)
+		get_random_tweet("Antho_Repartie")
+		return
 	}
 	chosenOption := cmdArgs[0]
 	switch chosenOption {
