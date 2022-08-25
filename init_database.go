@@ -16,9 +16,15 @@ const create string = `
 		Name TEXT NOT NULL,
 		ScreenName TEXT NOT NULL
 	);
+	CREATE TABLE IF NOT EXISTS TwitterCredentials (
+		ID INTEGER PRIMARY KEY CHECK (id = 1),
+		TWITTER_API_KEY TEXT,
+		TWITTER_API_KEY_SECRET TEXT,
+		TWITTER_ACCESS_TOKEN TEXT,
+		TWITTER_ACCESS_TOKEN_SECRET TEXT
+	);
+	INSERT OR IGNORE INTO TwitterCredentials (TWITTER_API_KEY, TWITTER_API_KEY_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET) VALUES ("", "", "", "");
 	`
-
-
 
 func createTables() (error) {
 	db, err := sql.Open("sqlite3", getDbPath())
