@@ -78,7 +78,7 @@ func list_users() {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT u.ID, u.Name, u.ScreenName, count(u.ScreenName) FROM DatabaseUsers u JOIN DatabaseTweets t ON u.ScreenName = t.Username GROUP BY u.ID")
+	rows, err := db.Query("SELECT u.ID, u.Name, u.ScreenName, count(u.ScreenName), u.Active FROM DatabaseUsers u JOIN DatabaseTweets t ON u.ScreenName = t.Username GROUP BY u.ID")
 	if err != nil {
 		log.Fatal("Error while querying the database for users", err)
 	}
@@ -88,6 +88,8 @@ func list_users() {
 	var Name string
 	var ScreenName string
 	var DbTweetCount int
+	var Active bool
+	var ActiveStr string = "[x]"
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -95,11 +97,15 @@ func list_users() {
 			&Name,
 			&ScreenName,
 			&DbTweetCount,
+			&Active,
 		)
 		if err != nil {
 			log.Fatal("Error while iterating over timeline results from db", err)
 		}
-		fmt.Printf("@%s (%s) - %d tweets\n", ScreenName, Name, DbTweetCount)
+		if !Active {
+			ActiveStr = "[ ]"
+		}
+		fmt.Printf("@%s (%s) %s - %d tweets\n", ScreenName, Name, ActiveStr, DbTweetCount)
 	}
 
 }
