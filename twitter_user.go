@@ -28,6 +28,5 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*Use
 		log.Fatal("Error while adding user to database", user_err)
 	}
 	fmt.Printf("Account: @%s (%s) (%d)\n", user.User.ScreenName, user.User.Name, user.User.ID)
-	fmt.Printf("Last Tweet ID: %d\n", user.User.Status.ID) // TODO: maybe this errors out when user has never tweeted
 	return &user
 }
