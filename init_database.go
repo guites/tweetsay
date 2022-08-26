@@ -14,7 +14,8 @@ const create string = `
 	CREATE TABLE IF NOT EXISTS DatabaseUsers (
 		ID INTEGER NOT NULL,
 		Name TEXT NOT NULL,
-		ScreenName TEXT NOT NULL
+		ScreenName TEXT NOT NULL,
+		Active BOOLEAN NOT NULL DEFAULT 0 CHECK (Active IN (0, 1))
 	);
 	CREATE TABLE IF NOT EXISTS TwitterCredentials (
 		ID INTEGER PRIMARY KEY CHECK (id = 1),

@@ -81,7 +81,8 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 	return false
 }
 
-func get_random_tweet(username string) {
+// prints a random tweet from active users
+func get_random_tweet() {
 	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
@@ -89,15 +90,9 @@ func get_random_tweet(username string) {
 	defer db.Close()
 
 	var tweet twitter.Tweet
-	stmt, stmt_err := db.Prepare("SELECT ID, FullText, CreatedAt FROM DatabaseTweets WHERE Username = ? ORDER BY RANDOM() LIMIT 1 ;")
-	
-	if stmt_err != nil {
-		log.Fatal("Error preparing statement", stmt_err)
-	}
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt FROM DatabaseTweets t INNER JOIN DatabaseUsers u on u.ScreenName = t.Username WHERE u.Active = 1 ORDER BY RANDOM() LIMIT 1;")
 
-	defer stmt.Close()
-
-	err := stmt.QueryRow(username).Scan(
+	err := row.Scan(
 		&tweet.ID,
 		&tweet.FullText,
 		&tweet.CreatedAt,
