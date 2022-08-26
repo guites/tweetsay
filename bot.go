@@ -29,7 +29,7 @@ func thething(client *twitter.Client) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	available_commands := "Available options: [add_user_timeline|list_users|toggle_user]"
+	available_commands := "Available options: [add_user_timeline|list_users|toggle_user|help]"
 
 	db_err := createTables()
 	if db_err != nil {
@@ -59,6 +59,8 @@ func main() {
 		}
 		username := removeAt(cmdArgs[1])
 		toggle_user(username)
+	case "help":
+		fmt.Println(available_commands)
 	default:
 		fmt.Println(available_commands)
 	}
