@@ -108,7 +108,7 @@ func list_users() {
 	var ScreenName string
 	var DbTweetCount int
 	var Active bool
-	var ActiveStr string = "[x]"
+	var ActiveStr string
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -121,7 +121,9 @@ func list_users() {
 		if err != nil {
 			log.Fatal("Error while iterating over timeline results from db", err)
 		}
-		if !Active {
+		if Active {
+			ActiveStr = "[x]"
+		} else {
 			ActiveStr = "[ ]"
 		}
 		fmt.Printf("@%s (%s) %s - %d tweets\n", ScreenName, Name, ActiveStr, DbTweetCount)
