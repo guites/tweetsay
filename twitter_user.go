@@ -7,7 +7,7 @@ import (
 	"github.com/dghubble/go-twitter/twitter"
 )
 
-func get_twitter_user_by_username(username string, client *twitter.Client) (*twitter.User){
+func get_twitter_user_by_username(username string, client *twitter.Client) (*User){
 
 	db_user, db_err := get_twitter_user_from_db(username)
 	if db_err == nil {
@@ -15,7 +15,7 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*twi
 	}
 
 	log.Printf("Fetching user @%s from Twitter API\n", username)
-	user, _, err := client.Users.Show(&twitter.UserShowParams{
+	twitter_user, _, err := client.Users.Show(&twitter.UserShowParams{
 		ScreenName: username, // "Antho_Repartie",
 	})
 
@@ -23,9 +23,11 @@ func get_twitter_user_by_username(username string, client *twitter.Client) (*twi
 		log.Fatalf("err: %s\n", err)
 	}
 
-	add_twitter_user_to_db(user)
-
-	fmt.Printf("Account: @%s (%s) (%d)\n", user.ScreenName, user.Name, user.ID)
-	fmt.Printf("Last Tweet ID: %d\n", user.Status.ID) // TODO: maybe this errors out when user has never tweeted
-	return user
+	user, user_err := add_twitter_user_to_db(twitter_user)
+	if user_err != nil {
+		log.Fatal("Error while adding user to database", user_err)
+	}
+	fmt.Printf("Account: @%s (%s) (%d)\n", user.User.ScreenName, user.User.Name, user.User.ID)
+	fmt.Printf("Last Tweet ID: %d\n", user.User.Status.ID) // TODO: maybe this errors out when user has never tweeted
+	return &user
 }

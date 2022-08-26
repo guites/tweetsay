@@ -8,14 +8,14 @@ import (
 )
 
 // fetch user tweets from API and save to database
-func get_user_timeline(user *twitter.User, client *twitter.Client) () {
+func get_user_timeline(user *User, client *twitter.Client) () {
 
-	if get_user_timeline_from_db(user) {
+	if get_user_timeline_from_db(user.User) {
 		return
 	}
-	log.Printf("Fetching user @%s tweets from Twitter API\n", user.ScreenName)
+	log.Printf("Fetching user @%s tweets from Twitter API\n", user.User.ScreenName)
 	tweets, _, err := client.Timelines.UserTimeline(&twitter.UserTimelineParams{
-		UserID: user.ID,
+		UserID: user.User.ID,
     	Count: 3200,
 		TweetMode: "extended",
 	})
