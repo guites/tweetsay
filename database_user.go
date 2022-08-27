@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
@@ -135,6 +136,7 @@ func toggle_user(username string) {
 	user, err := get_twitter_user_from_db(username)
 	if err != nil {
 		fmt.Printf("User @%s not registered in database. Please run <add_user_timeline @%s>\n", username, username)
+		os.Exit(1)
 	}
 	
 	db, db_err := sql.Open("sqlite3", getDbPath())
