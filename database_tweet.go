@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/dghubble/go-twitter/twitter"
 )
@@ -105,4 +108,55 @@ func get_random_tweet() (int64){
 
 	fmt.Println(tweet.FullText)
 	return tweet.ID
+}
+
+func list_words_from_last_tweet() {
+	db, db_err := sql.Open("sqlite3", getDbPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+
+	var tweet twitter.Tweet
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt FROM Tweets t INNER JOIN ShownTweets s ON t.ID = s.TweetID ORDER BY s.ID DESC LIMIT 1;")
+
+	err := row.Scan(
+		&tweet.ID,
+		&tweet.FullText,
+		&tweet.CreatedAt,
+	)
+	
+	if err != nil {
+		log.Fatal("error while querying the database for tweets - ", err)
+	}
+
+	// fmt.Println(tweet.FullText)
+	words := strings.Fields(tweet.FullText)
+
+	var max_length int
+	for _, word := range words {
+		curr_length := utf8.RuneCountInString(word)
+		if curr_length > max_length {
+			max_length = curr_length
+		}
+	}
+
+	for index, word := range words {
+		if word == "!" ||
+		word == "?" ||
+		word == "-" ||
+		word == ":" {
+			continue
+		}
+		wiktionary_link := "https://fr.wiktionary.org/wiki/" + word
+		if strings.HasPrefix(word, "http") {
+			wiktionary_link = ""
+		}
+		wrapped_word := word
+		if utf8.RuneCountInString(word) < max_length {
+			wrapped_word = word + strings.Repeat(" ", max_length - utf8.RuneCountInString(word))
+		}
+		padded_index := "0"+strconv.Itoa(index + 1)
+		fmt.Println(padded_index[len(padded_index)-2:], wrapped_word, wiktionary_link)
+	}
 }
