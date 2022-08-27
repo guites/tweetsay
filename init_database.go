@@ -5,13 +5,13 @@ import (
 )
 
 const create string = `
-	CREATE TABLE IF NOT EXISTS DatabaseTweets (
+	CREATE TABLE IF NOT EXISTS Tweets (
 		ID INTEGER NOT NULL,
 		CreatedAt TEXT NOT NULL,
 		FullText TEXT NOT NULL,
 		Username TEXT NOT NULL
 	);
-	CREATE TABLE IF NOT EXISTS DatabaseUsers (
+	CREATE TABLE IF NOT EXISTS Users (
 		ID INTEGER NOT NULL,
 		Name TEXT NOT NULL,
 		ScreenName TEXT NOT NULL,

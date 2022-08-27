@@ -16,7 +16,7 @@ func add_tweet_to_db (tweet *twitter.Tweet) {
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
-	stmt, stmt_err := db.Prepare("INSERT INTO DatabaseTweets (ID, CreatedAt, FullText, UserName) VALUES (?, ?, ?, ?)")
+	stmt, stmt_err := db.Prepare("INSERT INTO Tweets (ID, CreatedAt, FullText, UserName) VALUES (?, ?, ?, ?)")
 
 	if stmt_err != nil {
 		log.Fatalf((stmt_err.Error()))
@@ -44,7 +44,7 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 	}
 	defer db.Close()
 
-	stmt, stmt_err := db.Prepare("SELECT * FROM DatabaseTweets WHERE UserName = ?")
+	stmt, stmt_err := db.Prepare("SELECT * FROM Tweets WHERE UserName = ?")
 	if stmt_err != nil {
 		log.Fatal("Error preparing statement", stmt_err)
 	}
@@ -91,7 +91,7 @@ func get_random_tweet() (int64){
 	defer db.Close()
 
 	var tweet twitter.Tweet
-	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt FROM DatabaseTweets t INNER JOIN DatabaseUsers u on u.ScreenName = t.Username WHERE u.Active = 1 ORDER BY RANDOM() LIMIT 1;")
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt FROM Tweets t INNER JOIN Users u on u.ScreenName = t.Username WHERE u.Active = 1 ORDER BY RANDOM() LIMIT 1;")
 
 	err := row.Scan(
 		&tweet.ID,

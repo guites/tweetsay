@@ -24,7 +24,7 @@ func get_twitter_user_from_db(username string) (*User, error) {
 	var ScreenName string
 	var Active bool
 	
-	stmt, stmt_err := db.Prepare("SELECT * FROM DatabaseUsers WHERE ScreenName = ?")
+	stmt, stmt_err := db.Prepare("SELECT * FROM Users WHERE ScreenName = ?")
 	if stmt_err != nil {
 		log.Fatal("Error preparing statement", stmt_err)
 	}
@@ -62,7 +62,7 @@ func add_twitter_user_to_db (user *twitter.User) (User, error){
 		log.Fatal("Error opening database", db_err)
 	}
 
-	stmt, stmt_err := db.Prepare("INSERT INTO DatabaseUsers (ID, Name, ScreenName) VALUES (?, ?, ?)")
+	stmt, stmt_err := db.Prepare("INSERT INTO Users (ID, Name, ScreenName) VALUES (?, ?, ?)")
 	if stmt_err != nil {
 		log.Fatalf((stmt_err.Error()))
 	}
@@ -98,7 +98,7 @@ func list_users() {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT u.ID, u.Name, u.ScreenName, count(u.ScreenName), u.Active FROM DatabaseUsers u JOIN DatabaseTweets t ON u.ScreenName = t.Username GROUP BY u.ID")
+	rows, err := db.Query("SELECT u.ID, u.Name, u.ScreenName, count(u.ScreenName), u.Active FROM Users u JOIN Tweets t ON u.ScreenName = t.Username GROUP BY u.ID")
 	if err != nil {
 		log.Fatal("Error while querying the database for users", err)
 	}
@@ -145,7 +145,7 @@ func toggle_user(username string) {
 	}
 	defer db.Close()
 
-	stmt, stmt_err := db.Prepare("UPDATE DatabaseUsers SET Active = ? Where ScreenName = ?")
+	stmt, stmt_err := db.Prepare("UPDATE Users SET Active = ? Where ScreenName = ?")
 	if stmt_err != nil {
 		log.Fatalf((stmt_err.Error()))
 	}
