@@ -81,8 +81,9 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 	return false
 }
 
-// prints a random tweet from active users
-func get_random_tweet() {
+// prints a random tweet from active users,
+// returns that tweet ID
+func get_random_tweet() (int64){
 	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
@@ -103,4 +104,5 @@ func get_random_tweet() {
 	}
 
 	fmt.Println(tweet.FullText)
+	return tweet.ID
 }

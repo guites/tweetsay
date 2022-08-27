@@ -39,7 +39,8 @@ func main() {
 	client := prepare_twitter_api()
 	cmdArgs := os.Args[1:]
 	if len(cmdArgs) < 1 {
-		get_random_tweet()
+		tweetID := get_random_tweet()
+		set_last_shown_tweet(tweetID)
 		return
 	}
 	chosenOption := cmdArgs[0]

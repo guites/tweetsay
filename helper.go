@@ -110,3 +110,21 @@ func getDbPath() (string){
 	file := dirname + "/.francais-du-jour.db"
 	return file
 }
+
+func set_last_shown_tweet(tweetID int64) {	
+	db, db_err := sql.Open("sqlite3", getDbPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+
+	stmt, stmt_err := db.Prepare("INSERT INTO ShownTweets (TweetID) VALUES (?)")
+	if stmt_err != nil {
+		log.Fatalf((stmt_err.Error()))
+	}
+
+	_, err := stmt.Exec(tweetID)
+	if err != nil {
+		log.Fatal((err.Error()))
+	}
+	defer stmt.Close()
+}
