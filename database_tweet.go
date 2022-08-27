@@ -19,7 +19,7 @@ func add_tweet_to_db (tweet *twitter.Tweet) {
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
-	stmt, stmt_err := db.Prepare("INSERT INTO Tweets (ID, CreatedAt, FullText, UserName) VALUES (?, ?, ?, ?)")
+	stmt, stmt_err := db.Prepare("INSERT INTO Tweets (ID, CreatedAt, FullText, UserName, Lang) VALUES (?, ?, ?, ?, ?)")
 
 	if stmt_err != nil {
 		log.Fatalf((stmt_err.Error()))
@@ -29,6 +29,7 @@ func add_tweet_to_db (tweet *twitter.Tweet) {
 		tweet.CreatedAt,
 		tweet.FullText,
 		tweet.User.ScreenName,
+		tweet.Lang,
 	)
 
 	if err != nil {
@@ -60,10 +61,10 @@ func get_user_timeline_from_db(user *twitter.User) (bool) {
 	defer rows.Close()
 
 	var timeline []twitter.Tweet
-	var ID int64
+	var ID        int64
 	var CreatedAt string
-	var FullText string
-	var UserName string
+	var FullText  string
+	var UserName  string
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -118,16 +119,27 @@ func list_words_from_last_tweet() {
 	defer db.Close()
 
 	var tweet twitter.Tweet
-	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt FROM Tweets t INNER JOIN ShownTweets s ON t.ID = s.TweetID ORDER BY s.ID DESC LIMIT 1;")
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.CreatedAt, t.Lang FROM Tweets t INNER JOIN ShownTweets s ON t.ID = s.TweetID ORDER BY s.ID DESC LIMIT 1;")
 
 	err := row.Scan(
 		&tweet.ID,
 		&tweet.FullText,
 		&tweet.CreatedAt,
+		&tweet.Lang,
 	)
 	
 	if err != nil {
 		log.Fatal("error while querying the database for tweets - ", err)
+	}
+
+	// formats wiktionary url based on tweet Lang
+	var wiktionary_url string
+	if tweet.Lang == "und" ||
+	tweet.Lang == "qme" || 
+	tweet.Lang == "" {
+		wiktionary_url = "https://wiktionary.org/wiki/"
+	} else {
+		wiktionary_url =  "https://" + tweet.Lang + ".wiktionary.org/wiki/"
 	}
 
 	// fmt.Println(tweet.FullText)
@@ -148,7 +160,7 @@ func list_words_from_last_tweet() {
 		word == ":" {
 			continue
 		}
-		wiktionary_link := "https://fr.wiktionary.org/wiki/" + word
+		wiktionary_link := wiktionary_url + word
 		if strings.HasPrefix(word, "http") {
 			wiktionary_link = ""
 		}

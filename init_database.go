@@ -9,6 +9,7 @@ const create string = `
 		ID INTEGER NOT NULL,
 		CreatedAt TEXT NOT NULL,
 		FullText TEXT NOT NULL,
+		Lang TEXT NOT NULL DEFAULT "",
 		Username TEXT NOT NULL
 	);
 	CREATE TABLE IF NOT EXISTS Users (
