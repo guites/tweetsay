@@ -10,7 +10,8 @@ const create string = `
 		CreatedAt TEXT NOT NULL,
 		FullText TEXT NOT NULL,
 		Lang TEXT NOT NULL DEFAULT "",
-		Username TEXT NOT NULL
+		Username TEXT NOT NULL,
+		SoftDeleted BOOLEAN NOT NULL DEFAULT 0 CHECK (SoftDeleted IN (0,1))
 	);
 	CREATE TABLE IF NOT EXISTS Users (
 		ID INTEGER NOT NULL,

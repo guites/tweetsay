@@ -29,7 +29,7 @@ func thething(client *twitter.Client) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	available_commands := "Available options: [list_words|add_user_timeline|list_users|toggle_user|help]"
+	available_commands := "Available options: [delete_last|list_words|add_user_timeline|list_users|toggle_user|help]"
 
 	db_err := createTables()
 	if db_err != nil {
@@ -43,6 +43,7 @@ func main() {
 		set_last_shown_tweet(tweetID)
 		return
 	}
+	
 	chosenOption := cmdArgs[0]
 	switch chosenOption {
 	case "add_user_timeline":
@@ -62,6 +63,8 @@ func main() {
 		toggle_user(username)
 	case "list_words":
 		list_words_from_last_tweet()
+	case "delete_last":
+		delete_last_shown_tweet()
 	case "help":
 		fmt.Println(available_commands)
 	default:
