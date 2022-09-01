@@ -20,7 +20,7 @@ func removeAt(username string) (string) {
 
 func add_key_to_db(keyName string, keyValue string)() {
 	log.Printf("Saving key @%s to database\n", keyName)
-	
+
 	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
@@ -40,11 +40,9 @@ func add_key_to_db(keyName string, keyValue string)() {
 }
 
 func prompt_key_from_user(keyName string) (string) {
-
-    var keyValue string
-
-    fmt.Printf("Please enter you %s: ", keyName)
-    fmt.Scanf("%s", &keyValue)
+	var keyValue string
+	fmt.Printf("Please enter you %s: ", keyName)
+	fmt.Scanf("%s", &keyValue)
 	return keyValue
 }
 
@@ -62,9 +60,9 @@ func prepare_twitter_api() (*twitter.Client){
 	}
 	defer rows.Close()
 
-	var TWITTER_API_KEY       string
-	var TWITTER_API_KEY_SECRET    string
-	var TWITTER_ACCESS_TOKEN       string
+	var TWITTER_API_KEY string
+	var TWITTER_API_KEY_SECRET string
+	var TWITTER_ACCESS_TOKEN string
 	var TWITTER_ACCESS_TOKEN_SECRET string
 
 	db.QueryRow("SELECT TWITTER_API_KEY, TWITTER_API_KEY_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET FROM TwitterCredentials").Scan(
@@ -105,13 +103,13 @@ func prepare_twitter_api() (*twitter.Client){
 func getDbPath() (string){
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal( err )
+		log.Fatal(err)
 	}
-	file := dirname + "/.francais-du-jour.db"
+	file := dirname + "/.tweetsay.db"
 	return file
 }
 
-func set_last_shown_tweet(tweetID int64) {	
+func set_last_shown_tweet(tweetID int64) {
 	db, db_err := sql.Open("sqlite3", getDbPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
