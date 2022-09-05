@@ -26,7 +26,7 @@ func thething(client *twitter.Client) {
 	fmt.Printf("%s\n", tweet.FullText)
 }
 
-func main() {
+func bot() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	available_commands := `syntax: tweetsay [delete_last|list_words|list_users|add_user_timeline|toggle_user|help]
