@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 guites <gui.garcia67@gmail.com>
 
 */
 package cmd
