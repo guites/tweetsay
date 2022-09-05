@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"os"
+	"tweetsay/database"
 
 	"github.com/spf13/cobra"
 )
@@ -35,9 +36,10 @@ if you disliked the last shown tweet, you can delete it from the pool by running
 		
 you can also check your tracked users status by running
 	tweetsay listUsers`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		tweetID := database.GetRandomTweet()
+		database.SetLastShownTweet(tweetID)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
