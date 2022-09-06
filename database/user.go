@@ -86,3 +86,30 @@ func AddUser(user *twitter.User) (model.User, error){
 		Active: false,
 	}, nil
 }
+
+// flips user active field
+func ToggleUser(user *model.User) {
+	db, db_err := sql.Open("sqlite3", getPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+
+	stmt, stmt_err := db.Prepare("UPDATE Users SET Active = ? Where ScreenName = ?")
+	if stmt_err != nil {
+		log.Fatalf((stmt_err.Error()))
+	}
+	defer stmt.Close()
+
+	_, exec_err := stmt.Exec(!user.Active, user.User.ScreenName)
+	if exec_err != nil {
+		log.Fatal((exec_err.Error()))
+	}
+	print_string := "User @" + user.User.ScreenName + " is now"
+	if !user.Active {
+		print_string = print_string + " active."
+	} else {
+		print_string = print_string + " inactive."
+	}
+	fmt.Println(print_string)
+}
