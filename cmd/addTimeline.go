@@ -25,7 +25,7 @@ var addTimelineCmd = &cobra.Command{
 New tweets will also be fetched from the API and added to the pool.`,
 	Args: func (cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("usage: add_timeline @user_handle")
+			return errors.New("user handle is required")
 		}
 		return nil
 	},
