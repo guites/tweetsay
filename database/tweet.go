@@ -82,3 +82,27 @@ func SetLastShownTweet(tweetID int64) {
 	}
 	defer stmt.Close()
 }
+
+// retrieves the last shown tweet from the database
+func GetLastShownTweet() (twitter.Tweet){
+	db, db_err := sql.Open("sqlite3", getPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.Lang FROM Tweets t INNER JOIN ShownTweets l ON t.ID = l.TweetID ORDER BY l.ID DESC LIMIT 1;")
+
+	var tweet twitter.Tweet
+
+	err := row.Scan(
+		&tweet.ID,
+		&tweet.FullText,
+		&tweet.Lang,
+	)
+	
+	if err != nil {
+		log.Fatal("error while querying the database for tweets - ", err)
+	}
+
+	return tweet	
+}
