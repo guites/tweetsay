@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/dghubble/go-twitter/twitter"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // add tweet object to database
@@ -56,7 +58,8 @@ func GetRandomTweet() (int64){
 	)
 	
 	if err != nil {
-		log.Fatal("error while querying the database for tweets - ", err)
+		// this probably means that the database has no indexed timelines. quit silently
+		os.Exit(1)
 	}
 
 	fmt.Printf("@%s tweets: %s\n", username, tweet.FullText)

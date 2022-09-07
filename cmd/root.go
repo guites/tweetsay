@@ -29,8 +29,13 @@ list all the words on the last tweet with a link to their wiktionary page:
 if you disliked the last shown tweet, you can delete it from the pool by running:
 	tweetsay deleteLast
 you can also check your tracked users status by running:
-	tweetsay listUsers`,
+	tweetsay listUsers
+
+You can add shell completion running
+	tweetsay completion
+And following instructions.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		database.CreateTables()
 		tweetID := database.GetRandomTweet()
 		database.SetLastShownTweet(tweetID)
 	},

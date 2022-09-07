@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -34,8 +34,8 @@ const create string = `
 	);
 	`
 
-func createTables() (error) {
-	db, err := sql.Open("sqlite3", getDbPath())
+func CreateTables() (error) {
+	db, err := sql.Open("sqlite3", getPath())
 	if err != nil {
 		return err
 	}
