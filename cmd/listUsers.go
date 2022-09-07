@@ -1,11 +1,12 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 guites <gui.garcia67@gmail.com>
 
 */
 package cmd
 
 import (
 	"fmt"
+	"tweetsay/database"
 
 	"github.com/spf13/cobra"
 )
@@ -13,15 +14,19 @@ import (
 // listUsersCmd represents the listUsers command
 var listUsersCmd = &cobra.Command{
 	Use:   "listUsers",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Shows currently tracked twitter accounts",
+	Long: `Shows currently tracked twitter accounts alongside the number of indexed tweets and whether they are actively being drawn on new terminal windows.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("listUsers called")
+		users := database.GetAllUsersWithTweetCount()
+		var ActiveStr string
+		for _, user := range users {
+			if user.Active {
+				ActiveStr = "[x]"
+			} else {
+				ActiveStr = "[ ]"
+			}
+			fmt.Printf("@%s (%s) %s - %d tweets\n", user.User.ScreenName, user.User.Name, ActiveStr, user.DbTweetCount)
+		}
 	},
 }
 

@@ -113,3 +113,48 @@ func ToggleUser(user *model.User) {
 	}
 	fmt.Println(print_string)
 }
+
+func GetAllUsersWithTweetCount() []model.User {
+	db, db_err := sql.Open("sqlite3", getPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT u.ID, u.Name, u.ScreenName, count(u.ScreenName), u.Active FROM Users u JOIN Tweets t ON u.ScreenName = t.Username GROUP BY u.ID")
+	if err != nil {
+		log.Fatal("Error while querying the database for users", err)
+	}
+	defer rows.Close()
+
+	var ID int64
+	var Name string
+	var ScreenName string
+	var DbTweetCount int
+	var Active bool
+
+	var usersWithTweetCount []model.User
+
+	for rows.Next() {
+		err := rows.Scan(
+			&ID,
+			&Name,
+			&ScreenName,
+			&DbTweetCount,
+			&Active,
+		)
+		if err != nil {
+			log.Fatal("Error while iterating over timeline results from db", err)
+		}
+		usersWithTweetCount = append(usersWithTweetCount, model.User {
+			User: &twitter.User {
+				ID: ID,
+				Name: Name,
+				ScreenName: ScreenName,
+			},
+			Active: Active,
+			DbTweetCount: DbTweetCount,
+		})
+	}
+	return usersWithTweetCount
+}
