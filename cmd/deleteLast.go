@@ -1,11 +1,14 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 guites <gui.garcia67@gmail.com>
 
 */
 package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
+	"tweetsay/database"
 
 	"github.com/spf13/cobra"
 )
@@ -13,16 +16,32 @@ import (
 // deleteLastCmd represents the deleteLast command
 var deleteLastCmd = &cobra.Command{
 	Use:   "deleteLast",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Delete the last shown tweet from the pool",
+	Long: `Deletes the last shown tweet from the pool by setting its SoftDeleted flag to True.
+The tweet will therefore not be drawn on new terminal windows.
+You will be asked to confirm the action by typing 'delete'.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("deleteLast called")
-	},
+		tweet := database.GetLastShownTweet()
+
+		fmt.Printf("Delete tweet from @%s?\n",tweet.User.ScreenName)
+		if len(tweet.FullText) > 30 {
+			fmt.Println(tweet.FullText[:30],"...")
+		} else {
+			fmt.Println(tweet.FullText,"...")
+		}
+	
+		var confirmDelete string
+		fmt.Print("Please type 'delete' to confirm removal:")
+		fmt.Scanf("%s", &confirmDelete)
+		if strings.ToLower(confirmDelete) != "delete" {
+			fmt.Println("Tweet was not deleted.")
+			os.Exit(0)
+		}
+
+		database.DeleteTweet(tweet.ID)
+
+		fmt.Println("Tweet was deleted successfully.")
+},
 }
 
 func init() {

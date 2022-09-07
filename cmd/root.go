@@ -16,25 +16,19 @@ var rootCmd = &cobra.Command{
 	Use:   "tweetsay",
 	Short: "Tweetsay shows you tweets from selected accounts on terminal opening",
 	Long: `Tweetsay shows you tweets from selected accounts on terminal opening.
-	
 User timelines that are both added and toggled on will be drawn randomly each time a terminal window opens.
 
-Start by tracking an account
+Start by tracking an account:
 	tweetsay addTimeline @Antho_Repartie
-
-and then toggle it
+and then toggle it:
 	tweetsay toggleUser @Antho_Repartie
-
-get a random tweet from one of your toggled users by running tweetsay without any flags
+get a random tweet from one of your toggled users by running tweetsay without any flags:
 	tweetsay
-
-list all the words on the last tweet with a link to their wiktionary page
+list all the words on the last tweet with a link to their wiktionary page:
 	tweetsay listWords
-
-if you disliked the last shown tweet, you can delete it from the pool by running
+if you disliked the last shown tweet, you can delete it from the pool by running:
 	tweetsay deleteLast
-		
-you can also check your tracked users status by running
+you can also check your tracked users status by running:
 	tweetsay listUsers`,
 	Run: func(cmd *cobra.Command, args []string) {
 		tweetID := database.GetRandomTweet()

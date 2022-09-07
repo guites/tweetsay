@@ -83,26 +83,49 @@ func SetLastShownTweet(tweetID int64) {
 	defer stmt.Close()
 }
 
-// retrieves the last shown tweet from the database
+// retrieves the last shown tweet that is not SoftDeleted from the database
 func GetLastShownTweet() (twitter.Tweet){
 	db, db_err := sql.Open("sqlite3", getPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
 	}
 	defer db.Close()
-	row := db.QueryRow("SELECT t.ID, t.FullText, t.Lang FROM Tweets t INNER JOIN ShownTweets l ON t.ID = l.TweetID ORDER BY l.ID DESC LIMIT 1;")
+	row := db.QueryRow("SELECT t.ID, t.FullText, t.Lang, t.Username, s.ID FROM Tweets t INNER JOIN ShownTweets s ON t.ID = s.TweetID WHERE t.SoftDeleted = 0 ORDER BY s.ID DESC LIMIT 1;")
 
 	var tweet twitter.Tweet
+	var user twitter.User
+	var lastShownTweetID int64
 
 	err := row.Scan(
 		&tweet.ID,
 		&tweet.FullText,
 		&tweet.Lang,
+		&user.ScreenName,
+		&lastShownTweetID,
 	)
 	
 	if err != nil {
 		log.Fatal("error while querying the database for tweets - ", err)
 	}
-
+	tweet.User = &user
 	return tweet	
+}
+
+// Sets tweet SoftDeleted flag to TRUE
+func DeleteTweet(tweetID int64) {
+	db, db_err := sql.Open("sqlite3", getPath())
+	if db_err != nil {
+		log.Fatal("Error opening database", db_err)
+	}
+	defer db.Close()
+	stmt, stmt_err := db.Prepare("UPDATE Tweets SET SoftDeleted = ? Where ID = ?")
+	if stmt_err != nil {
+		log.Fatalf((stmt_err.Error()))
+	}
+	defer stmt.Close()
+
+	_, exec_err := stmt.Exec(true, tweetID)
+	if exec_err != nil {
+		log.Fatal((exec_err.Error()))
+	}
 }
