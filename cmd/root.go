@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 	"tweetsay/database"
 
 	"github.com/spf13/cobra"
@@ -36,8 +37,14 @@ You can add shell completion running
 And following instructions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		database.CreateTables()
-		tweetID := database.GetRandomTweet()
-		database.SetLastShownTweet(tweetID)
+		tweet := database.GetRandomTweet()
+		database.SetLastShownTweet(tweet.ID)
+		words := strings.Fields(tweet.FullText)
+		var wordID int
+		for _, word := range words {
+			wordID = database.AddWord(word)
+			database.RelateWordToTweet(wordID, tweet.ID)
+		}
 	},
 }
 

@@ -38,8 +38,8 @@ func AddTweet (tweet *twitter.Tweet) {
 }
 
 // prints a random tweet from active users,
-// returns that tweet ID
-func GetRandomTweet() (int64){
+// returns that tweet object
+func GetRandomTweet() (twitter.Tweet){
 	db, db_err := sql.Open("sqlite3", getPath())
 	if db_err != nil {
 		log.Fatal("Error opening database", db_err)
@@ -63,7 +63,7 @@ func GetRandomTweet() (int64){
 	}
 
 	fmt.Printf("@%s tweets: %s\n", username, tweet.FullText)
-	return tweet.ID
+	return tweet
 }
 
 
