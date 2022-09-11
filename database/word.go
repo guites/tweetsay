@@ -23,7 +23,9 @@ func AddWord (word string) int{
 	}
 	defer stmt.Close()
 
-	_, err := stmt.Exec(word)
+	// add all words in uppercase to database
+	uppercase_word := strings.ToUpper(word)
+	_, err := stmt.Exec(uppercase_word)
 	if err != nil {
 		if ! strings.Contains(err.Error(), "UNIQUE") {
 			log.Fatalf("Error while inserting word %s into database, details: %s", word, err.Error())
@@ -34,7 +36,7 @@ func AddWord (word string) int{
 	// we need another query to retrieve its ID
 
 	var wordID int
-	row := db.QueryRow("SELECT ID FROM Words WHERE word = ?", word)
+	row := db.QueryRow("SELECT ID FROM Words WHERE word = ?", uppercase_word)
 	err_row := row.Scan(&wordID)
 	if err_row != nil {
 		log.Fatal((err_row.Error()))
@@ -84,7 +86,10 @@ func FindTweetsContainingWord(word string) []TweetExcerpt {
 	var tweetFullText string
 	var tweetUsername string
 	
-	rows, query_err := db.Query("SELECT t.id, t.FullText, t.Username FROM Tweets t INNER JOIN WordAppearances wa ON wa.TweetID = t.ID INNER JOIN Words w ON w.ID = wa.WordID WHERE w.word = (?) AND SoftDeleted = 0", word)
+
+	// words are all uppercased in database
+	uppercase_word := strings.ToUpper(word)
+	rows, query_err := db.Query("SELECT t.id, t.FullText, t.Username FROM Tweets t INNER JOIN WordAppearances wa ON wa.TweetID = t.ID INNER JOIN Words w ON w.ID = wa.WordID WHERE w.word = (?) AND SoftDeleted = 0", uppercase_word)
 	if query_err != nil {
 		log.Fatalf("Error while searching for tweets containing the word <<%s>>, detail: %s\n", word, query_err.Error())
 	}
@@ -94,8 +99,9 @@ func FindTweetsContainingWord(word string) []TweetExcerpt {
 		if scan_err != nil {
 			log.Fatalln("Error while iterating over results from db:", scan_err)
 		}
+		uppercase_fulltext := strings.ToUpper(tweetFullText)
 		word_len := utf8.RuneCountInString(word)
-		word_offset := strings.Index(tweetFullText, word)
+		word_offset := strings.Index(uppercase_fulltext, uppercase_word)
 		start_index := word_offset - 20
 		if start_index < 0 {
 			start_index = 0
