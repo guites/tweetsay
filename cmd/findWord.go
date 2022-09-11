@@ -25,7 +25,9 @@ var findWordCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		tweetExcerpts := database.FindTweetsContainingWord(args[0])
-		fmt.Printf("%v\n", tweetExcerpts)
+		for _, excerpt := range tweetExcerpts {
+			fmt.Printf("@%s (%d): %s\n", excerpt.Username, excerpt.TweetID, excerpt.TweetExcerpt)
+		}
 	},
 }
 

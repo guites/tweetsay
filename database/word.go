@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 // adds word to database, returns that word id
@@ -93,11 +94,20 @@ func FindTweetsContainingWord(word string) []TweetExcerpt {
 		if scan_err != nil {
 			log.Fatalln("Error while iterating over results from db:", scan_err)
 		}
+		word_len := utf8.RuneCountInString(word)
+		word_offset := strings.Index(tweetFullText, word)
+		start_index := word_offset - 20
+		if start_index < 0 {
+			start_index = 0
+		}
+		end_index := word_offset + word_len + 20
+		if end_index > len(tweetFullText) {
+			end_index = len(tweetFullText)
+		}
 		tweetExcerpt := TweetExcerpt{
 			Username: tweetUsername,
 			TweetID: tweetID,
-			// TODO: include only a few words before and after the appearance of the searched word
-			TweetExcerpt: tweetFullText,
+			TweetExcerpt: "..." + tweetFullText[start_index : end_index] + "...",
 		}
 		tweetExcerpts = append(tweetExcerpts, tweetExcerpt)
 	}
