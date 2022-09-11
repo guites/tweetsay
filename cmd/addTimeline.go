@@ -30,7 +30,7 @@ New tweets will also be fetched from the API and added to the pool.`,
 		return nil
 	},
 Run: func(cmd *cobra.Command, args []string) {
-		client := helper.GetTwitterClient()
+		client := database.GetTwitterClient()
 
 		username := helper.RemoveAt(args[0])
 		

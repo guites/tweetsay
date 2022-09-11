@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func AddKey(keyName string, keyValue string)() {
+func addKey(keyName string, keyValue string)() {
 	log.Printf("Saving key @%s to database\n", keyName)
 
 	db, db_err := sql.Open("sqlite3", getPath())
