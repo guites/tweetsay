@@ -8,6 +8,8 @@ import (
 	"strings"
 	"tweetsay/helper"
 	"unicode/utf8"
+
+	"github.com/forPelevin/gomoji"
 )
 
 // adds word to database, returns that word id
@@ -26,6 +28,10 @@ func AddWord (word string) int{
 
 	// add all words in uppercase to database
 	stripped_word := helper.RemoveSymbols(word)
+	stripped_word = gomoji.RemoveEmojis(stripped_word)
+	if stripped_word == "" {
+		return -1
+	}
 	uppercase_word := strings.ToUpper(stripped_word)
 	_, err := stmt.Exec(uppercase_word)
 	if err != nil {

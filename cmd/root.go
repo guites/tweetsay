@@ -48,7 +48,9 @@ And following instructions.`,
 				continue
 			}
 			wordID = database.AddWord(word)
-			database.RelateWordToTweet(wordID, tweet.ID)
+			if wordID != -1 {
+				database.RelateWordToTweet(wordID, tweet.ID)
+			}
 		}
 	},
 }
