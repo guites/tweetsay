@@ -42,6 +42,11 @@ And following instructions.`,
 		words := strings.Fields(tweet.FullText)
 		var wordID int
 		for _, word := range words {
+			// do not index user handles or urls
+			if strings.HasPrefix(word, "@") ||
+			strings.HasPrefix(word, "http") {
+				continue
+			}
 			wordID = database.AddWord(word)
 			database.RelateWordToTweet(wordID, tweet.ID)
 		}
