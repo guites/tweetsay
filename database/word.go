@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"tweetsay/helper"
 	"unicode/utf8"
 )
 
@@ -24,7 +25,8 @@ func AddWord (word string) int{
 	defer stmt.Close()
 
 	// add all words in uppercase to database
-	uppercase_word := strings.ToUpper(word)
+	stripped_word := helper.RemoveSymbols(word)
+	uppercase_word := strings.ToUpper(stripped_word)
 	_, err := stmt.Exec(uppercase_word)
 	if err != nil {
 		if ! strings.Contains(err.Error(), "UNIQUE") {
